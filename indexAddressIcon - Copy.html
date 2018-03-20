@@ -7,10 +7,10 @@
         width: 100%;
        }
     </style>
-    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <!--<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
     <script defer/
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC2Q6v4pp6XCEO-0W8dayfApTx4TVahR3g">
-    </script>
+    </script>-->
   </head>
   <body>
 	  
@@ -21,14 +21,14 @@
     <p id="map"></p>
     <p id="eta">e</p>
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlbPL8pr_P6rNXL2qC4nTGifQJvXf8R7U
-        &libraries=visualization&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlbPL8pr_P6rNXL2qC4nTGifQJvXf8R7U&libraries=visualization&callback=initMap">
     </script>
 
  <!--<script type="text/javascript" src="time.js"></script>-->
    
     <script>
-		
+	etaText= document.getElementById('eta');
+	etaText.innerHTML="ETA";
       function initMap() {
     var map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: 0, lng: 0},
@@ -43,22 +43,22 @@
       disableDoubleClickZoom: true
     });
 
-var heatmap = new google.maps.visualization.HeatmapLayer({
+/*var heatmap = new google.maps.visualization.HeatmapLayer({
     data: [],
     map: map,
     radius: 10
   });
-  
+  */
 	 var marker = new google.maps.Marker({
     icon: 'http://icons.iconarchive.com/icons/flaticonmaker/flat-style/24/bus-icon.png',
     map: map
   		});
 	var firebase = new Firebase("https://bustracking-e133e.firebaseio.com/");
 	var user = firebase.child('User');
-	
+
     user.orderByChild('User').on('value', function(snapshot) {
    var newPosition = snapshot.val();
-    point = new google.maps.LatLng(newPosition.latitude, newPosition.longitude);
+   var point = new google.maps.LatLng(newPosition.latitude, newPosition.longitude);
    map.setCenter(point);
    map.setZoom(15);
    //heatmap.setMap(null);
@@ -76,41 +76,47 @@ var heatmap = new google.maps.visualization.HeatmapLayer({
         if (status == google.maps.GeocoderStatus.OK) {
             console.log(results);
             var address = (results[0].formatted_address);
-            document.getElementById('loc').innerHTML=address;
+            document.getElementById('loc').innerHTML="Current Location of Bus :"+	address;
         }
     });
     //Reverse Geocoding End
-    document.getElementById('eta').innerHTML="eta";
+    //document.getElementById('eta').innerHTML="eta";
     //calculateTime(point);
    
-
-document.getElementById('eta').innerHTML="etacall";
+    var destinationA;
+//document.getElementById('eta').innerHTML="etacall";
 	if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showTime);
     } else {
         document.getElementById('eta').innerHTML = "Geolocation is not supported by this browser.";
     }
+    //destination= new google.maps.LatLng(18.201894,79.396708);
 
 function showTime(position) {	
-      destination = new google.maps.LatLng(position.coords.latitude,position.coords.longitude); 
-  }
+       destinationA = new google.maps.LatLng(position.coords.latitude,position.coords.longitude); 
+  
+  	 //etaText.innerHTML ="Latitude: " + position.coords.latitude + 
+    //"<br>Longitude: " + position.coords.longitude;
+		
+
+    etaText.innerHTML="after coords";
      var service = new google.maps.DistanceMatrixService();
 service.getDistanceMatrix(
   {
     origins: [point],
-    destinations: [destination],
+    destinations:[destinationA],
     travelMode: google.maps.TravelMode.DRIVING,
     //drivingOptions:,
     unitSystem: google.maps.UnitSystem.METRIC,
     avoidHighways: false,
     avoidTolls: true,
-  }, callback1);
-var etaText= document.getElementById('eta').innerHTML="toward end";
-function callback1(response, status) {
-  if(status !== 'OK')
-  	{etaText="Cannot Find ETA";}
+  }, //);
+function (response, status) {
+	etaText.innerHTML="callback1";
+  if(status != google.maps.DistanceMatrixStatus.OK)
+  	{etaText.innerHTML="Cannot Find ETA";}
   else{
-  	etaText="after toward end";
+  	etaText.innerHTML="after toward end";
   	var origin=response.originAddresses[0];
   	var destination=response.destinationAddresses[0];
   	if(response.rows[0].elements[0].status=="ZERO_RESULTS")
@@ -119,16 +125,16 @@ function callback1(response, status) {
   	}
   	else{
   		var distance=response.rows[0].elements[0].distance;
-  		var duration=response.rows[0].elements[0].duration.value;
+  		var duration=response.rows[0].elements[0].duration.text;
   		var distance_in_kilo=distance.value/1000;
 
-  		etaText="distance: "+distance+" <br>It takes "+duration+"to reach "+destination;
+  		etaText.innerHTML="Distance from BusLocation to YourLocation : <b>"+distance_in_kilo+"</b>	 <br> It takes Approx. <b>"+duration+"</b> to reach <b>"+destination;
   	}
   }
+} );
+
+
 }
-
-
-//}
 //*/
  }
 );    
