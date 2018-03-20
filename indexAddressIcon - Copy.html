@@ -128,7 +128,7 @@ function (response, status) {
   		var duration=response.rows[0].elements[0].duration.text;
   		var distance_in_kilo=distance.value/1000;
 
-  		etaText.innerHTML="Distance from BusLocation to YourLocation : <b>"+distance_in_kilo+"</b>	 <br> It takes Approx. <b>"+duration+"</b> to reach <b>"+destination;
+  		etaText.innerHTML="Distance from BusLocation to YourLocation : <b>"+distance_in_kilo+"KM</b>	 <br> It takes Approx. <b>"+duration+"</b> to reach <b>"+destination;
   	}
   }
 } );
